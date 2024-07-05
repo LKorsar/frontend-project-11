@@ -1,10 +1,13 @@
 import  './styles.scss';
 import  'bootstrap';
 
-console.log("Hello World!");
-
 export default () => {
   const state = {
-    shown: 'form',
+    searchForm: {
+      valid: null,
+      errors: [],
+      value: '',
+    },
+    modal: 'hidden',
   };
 };
