@@ -10,8 +10,6 @@ export default {
       feeds: 'Фиды',
       buttons: {
         viewBtn: 'Посмотр',
-        readFullBtn: 'Читать полностью',
-        closeBtn: 'Закрыть',
       },
     },
   };

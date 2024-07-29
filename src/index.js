@@ -6,11 +6,12 @@ import i18next, { init } from 'i18next';
 import resources from './locales/index.js';
 import view from './view.js';
 
-const app = () => {
+const app = async () => {
   const elements = {
     form: document.querySelector('.rss-form'),
     input: form.querySelector('#url-input'),
     postsList: document.querySelector('.posts'),
+    feedsList: document.querySelector('.feeds'),
     feedback: document.querySelector('.feedback'),
   };
 
@@ -27,8 +28,13 @@ const app = () => {
     posts: [],
     feeds: [],
   };
-   
-  const { watchedState } = view(elements, i18n, state);
+
+  yup.setLocale({
+    mixed: {
+      url: () => ({ key: 'feedbacks.feedbackWrongURL' }),
+      notOneOf: () => ({ key: 'feedbacks.feedbackRepeat' }),
+    },
+  });
 
   const defaultLang = 'ru';
   const i18n = i18next.createInstance();
@@ -40,39 +46,33 @@ const app = () => {
     .then(() => console.log('i18next instance initiated successfully'))
     .catch(() => console.log('i18next instance caused an error'));
 
+  const { watchedState } = view(elements, i18n, state);
+
   const loadedFeeds = watchedState.feeds;
 
   const schema = yup.object({
     inputUrl: yup.string()
-    .url(i18nInstance.t('feedbacks.feedbackWrongURL'))
+    .url()
     .required()
-    .notOneOf(loadedFeeds, i18nInstance.t('feedbacks.feedbackRepeat')),
+    .notOneOf([yup.ref(loadedFeeds)]),
   });
 
-  const validateURL = ({ inputUrl }) => {
-    schema.validate({ inputUrl })
-      .then(() => console.log('validation acomplished successfully'))
-      .catch((err) => console.log(err.errors))
-  };
-
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = formData.get('url');
     watchedState.rssForm.inputUrl = data;
-    const validationErrors = schema.validate({ inputUrl: watchedState.rssForm.inputUrl })
-      .then(() => console.log('validation acomplished successfully'))
-      .catch((error) => {
-        return error.message
-      });
-    watchedState.rssForm.errors = validationErrors;
-    watchedState.rssForm.valid = _.isEmpty(errors);
-    if (_.isEmpty(errors)) {
-      // sending request to server
-      //const response
-    }
-    else {
-
+    try {
+      await schema.validate({ inputUrl: watchedState.rssForm.inputUrl }, { abortEarly: false });
+      watchedState.rssForm.valid = true;
+      watchedState.rssForm.errors = [];
+    } catch (error) {
+      const validationErrors = error.message;
+      watchedState.rssForm.errors = validationErrors;
+    };
+    console.log(validationErrors);
+    if (watchedState.rssForm.errors.length === 0) {
+      watchedState.processApp.processState = 'sending';
     }
   });
 

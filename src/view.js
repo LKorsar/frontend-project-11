@@ -11,7 +11,8 @@ const renderSuccessFeedBack = (elements, i18n) => {
 const renderError = (elements, state) => {
   elements.input.classList.remove('text-success');  
   elements.input.classList.add('text-danger');
-  elements.feedback.textContent = state.rssForm.errors;
+  const errorToDisplay = state.rssForm.errors;
+  elements.feedback.textContent = i18n.t(errorToDisplay);
   elements.form.reset();
   elements.input.focus();
 };

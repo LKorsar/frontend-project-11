@@ -10,8 +10,6 @@ export default {
       feeds: 'Feeds',
       buttons: {
         viewBtn: 'View',
-        readFullBtn: 'Read the full version',
-        closeBtn: 'Close',
       },
     },
   };
