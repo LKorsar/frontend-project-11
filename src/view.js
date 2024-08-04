@@ -1,11 +1,9 @@
 import onChange from 'on-change';
 
 const renderSuccessFeedBack = (elements, i18n, state) => {
-  console.log('success');
   elements.feedback.classList.remove('text-danger');
   elements.feedback.classList.add('text-success');
   elements.input.classList.remove('is-invalid');
-  console.log(i18n.t('feedbacks.feedbackSuccess'));
   const feedText = i18n.t('feedbacks.feedbackSuccess');
   elements.feedback.textContent = feedText;
   elements.form.reset();
