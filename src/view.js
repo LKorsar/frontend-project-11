@@ -23,14 +23,32 @@ const renderError = (elements, i18n, state) => {
   }
 };
 
+const handleProcessError = (elements, i18n, state) => {
+    elements.feedback.classList.remove('text-success');
+    elements.feedback.classList.add('text-danger');
+    elements.feedback.textContent = i18n.t('feedbacks.feedbackNoRSS');
+};
+
+const handleProcessState = (elements, i18n, state) => {
+
+};
+
+const handleFeeds = () => {
+  
+};
+
+const handlePosts = () => {
+  
+};
+
 export default (elements, i18n, state) => {
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
-      case 'processApp.processState':
-        
+      case 'processState':
+        handleProcessState(elements, i18n, state);
         break;
-      case 'processApp.processError':
-
+      case 'processError':
+        handleProcessError(elements, i18n, state);
         break;
       case 'rssForm.valid':
         renderSuccessFeedBack(elements, i18n, state);
@@ -38,6 +56,12 @@ export default (elements, i18n, state) => {
       case 'rssForm.errors':
         renderError(elements, i18n, state);
         break;
+      case 'feeds':
+        handleFeeds(elements, i18n, state);
+        break;
+      case 'posts':
+        handlePosts(elements, i18n, state);
+        break;    
       default:
         break;      
     }

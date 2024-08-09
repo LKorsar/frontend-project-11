@@ -5,6 +5,31 @@ import _ from 'lodash';
 import i18next from 'i18next';
 import resources from './locales/index.js';
 import view from './view.js';
+import getAxiosResponse from './getAxiosResponse.js';
+import parse from './parser.js';
+
+const createId = () => {
+  return _.uniqueId();
+};
+
+const addFeed = (id, title, description, state) => {
+  state.feeds.push({ 
+    feedId: id,
+    feedTitle: title,
+    feedDescription: description,
+  });
+};
+
+const addPosts = (feedId, posts, state) => {
+  const feedPosts = posts.map((post) => ({
+    feedId,
+    id: createId(),
+    title: post.title,
+    description: post.description,
+    link: post.link,
+  }));
+  state.posts = feedPosts.concat(state.posts);
+};
 
 const app = () => {
   const elements = {
@@ -16,17 +41,16 @@ const app = () => {
   };
 
   const state = {
-    processApp: {
-      processState: 'filling',
-      processError: null,
-    },
+    processState: 'filling',
+    processError: null,
     rssForm: {
       valid: null,
       errors: [],
       inputUrl: '',
     },
-    posts: [],
     feeds: [],
+    posts: [],
+    loadedLinks: [],
   };
 
   yup.setLocale({
@@ -50,7 +74,7 @@ const app = () => {
 
   const watchedState = view(elements, i18n, state);
 
-  const loadedFeeds = watchedState.feeds;
+  const loadedFeeds = watchedState.loadedLinks;
 
   const schema = yup.object({
     inputUrl: yup.string()
@@ -75,10 +99,33 @@ const app = () => {
       });
       
     if (watchedState.rssForm.errors.length === 0) {
-      watchedState.processApp.processState = 'sending';
-    }
-  });
+      watchedState.processState = 'request';
 
+      console.log(watchedState.rssForm.inputUrl);
+      getAxiosResponse(watchedState.rssForm.inputUrl)
+        .then((response) => {
+          console.log(response.status);
+          console.log(response.data);
+          parse(response.data.contents);
+        })
+        .then((parsedRSS) => {
+          const feedId = createId();
+          const title = parsedRSS.feed.channelTitle;
+          const description = parsedRSS.feed.channelDescription;
+
+          addFeed(feedId, title, description, watchedState);
+          console.log(watchedState.feeds);
+          addPosts(feedId, parsedRSS.posts, watchedState);
+          watchedState.processState = 'loaded';
+          watchedState.loadedLinks.push(watchedState.rssForm.inputUrl);
+          watchedState.rssForm.inputUrl = '';
+        })
+        .catch ((err) => {
+          watchedState.processError = err.message;
+          watchedState.processState = 'filling';
+        })
+      }    
+  });
 };
 
 export default app;
