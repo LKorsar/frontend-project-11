@@ -9,8 +9,8 @@ const parse = (response) => {
     throw new Error('parsing error');
   } else {
     const channel = xmlDocument.querySelector('channel');
-    const channelTitle = xmlDocument.querySelector('channel title').textContent;
-    const channelDescription = xmlDocument.querySelector('channel description').textContent;
+    const channelTitle = xmlDocument.querySelector('title').textContent;
+    const channelDescription = xmlDocument.querySelector('description').textContent;
     const feed = { channelTitle, channelDescription };
 
     const itemElements = channel.querySelectorAll('item');

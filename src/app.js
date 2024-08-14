@@ -35,6 +35,7 @@ const app = () => {
   const elements = {
     form: document.querySelector('.rss-form'),
     input: document.querySelector('#url-input'),
+    button: document.querySelector('button[aria-label="add"]'),
     postsList: document.querySelector('.posts'),
     feedsList: document.querySelector('.feeds'),
     feedback: document.querySelector('.feedback'),
@@ -78,6 +79,7 @@ const app = () => {
 
   const schema = yup.object({
     inputUrl: yup.string()
+    .trim()
     .url()
     .notOneOf([`${loadedFeeds}`]),
   });
@@ -101,9 +103,10 @@ const app = () => {
     if (watchedState.rssForm.errors.length === 0) {
       watchedState.processState = 'request';
 
-      console.log(watchedState.rssForm.inputUrl);
+      // console.log(watchedState.rssForm.inputUrl);
       getAxiosResponse(watchedState.rssForm.inputUrl)
         .then((response) => {
+          console.log(response);
           console.log(response.status);
           console.log(response.data);
           parse(response.data.contents);
