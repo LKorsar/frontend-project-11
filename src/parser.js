@@ -1,7 +1,7 @@
-const parse = (response) => {
-  console.log(response);
+const parse = (responseData) => {
+  // console.log(responseData);
   const parser = new DOMParser();
-  const xmlDocument = parser.parseFromString(response, "application/xml");
+  const xmlDocument = parser.parseFromString(responseData, "text/xml");
 
   const errorNode = xmlDocument.querySelector('parsererror');
   if (errorNode) {
@@ -9,9 +9,10 @@ const parse = (response) => {
     throw new Error('parsing error');
   } else {
     const channel = xmlDocument.querySelector('channel');
-    const channelTitle = xmlDocument.querySelector('title').textContent;
-    const channelDescription = xmlDocument.querySelector('description').textContent;
+    const channelTitle = channel.querySelector('title').textContent;
+    const channelDescription = channel.querySelector('description').textContent;
     const feed = { channelTitle, channelDescription };
+    console.log(feed);
 
     const itemElements = channel.querySelectorAll('item');
     const posts = [...itemElements].map((item) => {
@@ -26,8 +27,8 @@ const parse = (response) => {
     });
 
     const parsedRSS = { feed, posts };
-
-    return Promise.resolve(parsedRSS);
+    return parsedRSS;
+    //return Promise.resolve(parsedRSS);
   }
 };
 
