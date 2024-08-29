@@ -11,5 +11,8 @@ export default {
       buttons: {
         viewBtn: 'View',
       },
+      errors: {
+        network: 'Network error',
+      },
     },
   };

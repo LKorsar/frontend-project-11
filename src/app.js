@@ -97,8 +97,14 @@ const app = () => {
         return getAxiosResponse(validUrl);
       })
       .then((response) => {
-        const extractedData = response.data.contents;
-        return parse(extractedData);
+        console.log(response.status);
+         //if (response.status >= 400) {
+          //watchedState.processState = 'error';
+          //watchedState.processError = 'networkError';
+        //} else {
+          const extractedData = response.data.contents;
+          return parse(extractedData);
+        //}
       })
        .then((parsedRSS) => {
          console.log(parsedRSS.feed);
@@ -116,9 +122,13 @@ const app = () => {
       .catch((error) => {
         console.log(watchedState);
         console.log(error);
-        watchedState.processError = error.message;
         watchedState.processState = 'error';
         watchedState.rssForm.valid = false;
+        if (error.isAxiosError) {
+          watchedState.processError = 'Network Error';
+        } else {
+          watchedState.processError = error.message;
+        }
       });    
   });
 };

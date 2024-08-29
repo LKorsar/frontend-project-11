@@ -15,8 +15,12 @@ const handleProcessError = (elements, i18n, state) => {
     elements.feedback.classList.remove('text-success');  
     elements.feedback.classList.add('text-danger');
     elements.input.classList.add('is-invalid');
-    const errorToDisplay = state.processError;
-    elements.feedback.textContent = i18n.t(errorToDisplay.key);
+    if (state.processError === 'Network Error') {
+      elements.feedback.textContent = i18n.t('errors.network');
+    } else {
+      const errorToDisplay = state.processError;
+      elements.feedback.textContent = i18n.t(errorToDisplay.key);
+    }
   } else { 
     elements.input.classList.remove('is-invalid');
     elements.feedback.classList.remove('text-danger');

@@ -11,5 +11,8 @@ export default {
       buttons: {
         viewBtn: 'Посмотр',
       },
+      errors: {
+        network: 'Ошибка сети',
+      },
     },
   };
