@@ -1,5 +1,4 @@
 const parse = (responseData) => {
-  // console.log(responseData);
   const parser = new DOMParser();
   const xmlDocument = parser.parseFromString(responseData, "text/xml");
 
@@ -28,7 +27,6 @@ const parse = (responseData) => {
 
     const parsedRSS = { feed, posts };
     return parsedRSS;
-    //return Promise.resolve(parsedRSS);
   }
 };
 
