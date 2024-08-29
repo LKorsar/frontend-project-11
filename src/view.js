@@ -17,6 +17,8 @@ const handleProcessError = (elements, i18n, state) => {
     elements.input.classList.add('is-invalid');
     if (state.processError === 'Network Error') {
       elements.feedback.textContent = i18n.t('errors.network');
+    } else if (state.processError === 'noRSS') {
+      elements.feedback.textContent = i18n.t('feedbacks.feedbackNoRSS');
     } else {
       const errorToDisplay = state.processError;
       elements.feedback.textContent = i18n.t(errorToDisplay.key);

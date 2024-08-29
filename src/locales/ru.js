@@ -4,7 +4,7 @@ export default {
         feedbackSuccess: 'RSS успешно загружен',
         feedbackWrongURL: 'Ссылка должна быть валидным URL',
         feedbackRepeat: 'RSS уже существует',
-        feedbackNoRSS: "RSS не содержит валидного RSS",
+        feedbackNoRSS: "Ресурс не содержит валидный RSS",
       },
       posts: 'Посты',
       feeds: 'Фиды',

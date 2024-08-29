@@ -40,6 +40,24 @@ const addPosts = (feedId, posts, state) => {
   state.posts = feedPosts.concat(state.posts);
 };
 
+const getNewPosts = (state) => {
+  state.feeds.forEach((feed) => {
+    getAxiosResponse(feed.link)
+      .then((res) => {
+        return parse(res.data.contents);
+      })
+      .then((parsedRSS) => {
+        parsedRSS.posts.map((post) => {
+          if (state.posts.description.includes(post.description)) {
+            return;
+          } else {
+            addPosts(feed.feedId, post, state);
+          }
+        })
+      })
+  })
+};
+
 const app = () => {
   const elements = {
     form: document.querySelector('.rss-form'),
@@ -93,21 +111,13 @@ const app = () => {
       .then((validUrl) => {
         watchedState.rssForm.valid = true;
         watchedState.processState = 'request';
-        console.log(validUrl);
         return getAxiosResponse(validUrl);
       })
       .then((response) => {
-        console.log(response.status);
-         //if (response.status >= 400) {
-          //watchedState.processState = 'error';
-          //watchedState.processError = 'networkError';
-        //} else {
-          const extractedData = response.data.contents;
-          return parse(extractedData);
-        //}
+        const extractedData = response.data.contents;
+        return parse(extractedData);
       })
        .then((parsedRSS) => {
-         console.log(parsedRSS.feed);
          const feedId = createId();
          const title = parsedRSS.feed.channelTitle;
          const description = parsedRSS.feed.channelDescription;
@@ -116,21 +126,24 @@ const app = () => {
 
          watchedState.processState = 'loaded';
          watchedState.loadedLinks.push(watchedState.rssForm.inputUrl);
-         console.log(watchedState.loadedLinks);
          watchedState.rssForm.inputUrl = '';
        })
       .catch((error) => {
-        console.log(watchedState);
-        console.log(error);
         watchedState.processState = 'error';
         watchedState.rssForm.valid = false;
         if (error.isAxiosError) {
           watchedState.processError = 'Network Error';
+        } else if (error.name === 'parsingError') {
+          watchedState.processError = 'noRSS';
         } else {
           watchedState.processError = error.message;
         }
       });    
   });
+
+  if (watchedState.feeds.length !== 0) {
+    setTimeout(getNewPosts, 5000);
+  };
 };
 
 export default app;
