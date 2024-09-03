@@ -114,6 +114,33 @@ const buildContainer = (title, elements, i18n, state) => {
   }
 };
 
+const renderModal = (elements, state) => {
+  elements.modal.classList.add('show');
+  elements.modal.setAttribute('aria-modal', 'true');
+  elements.modal.removeAttribute('aria-hidden');
+  elements.modal.style.display = 'block';
+
+  const loadedPost = state.posts.find((post) => post.id === state.modalId);
+  const modalTitle = document.querySelector('.modal-title');
+  modalTitle.textContent = loadedPost.title;
+  const modalBody = document.querySelector('.modal-body');
+  modalBody.textContent = loadedPost.description;
+  const modalLink = document.querySelector('.full-article');
+  modalLink.href = loadedPost.link;
+};
+
+const renderOpenedPosts = (elements, state) => {
+  elements.modal.classList.remove('show');
+  elements.modal.removeAttribute('aria-modal');
+  elements.modal.style.display = 'none';
+  elements.modal.setAttribute('aria-hidden', 'true');
+
+  const openedPost = document.querySelector(`a[data-id="${state.modalId}"]`);
+  openedPost.classList.remove('fw-bold');
+  openedPost.classList.add('fw-normal');
+  openedPost.classList.add('link-secondary');
+};
+
 export default (elements, i18n, state) => {
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
@@ -128,7 +155,11 @@ export default (elements, i18n, state) => {
         break;
       case 'posts':
         buildContainer('posts', elements, i18n, state);
-        break;    
+        break;
+      case 'modalId':
+        renderModal(elements, state);
+      case 'visitedLinks':
+        renderOpenedPosts(elements, state);    
       default:
         break;      
     }

@@ -40,24 +40,6 @@ const addPosts = (feedId, posts, state) => {
   state.posts = feedPosts.concat(state.posts);
 };
 
-const getNewPosts = (state) => {
-  state.feeds.forEach((feed) => {
-    getAxiosResponse(feed.link)
-      .then((res) => {
-        return parse(res.data.contents);
-      })
-      .then((parsedRSS) => {
-        parsedRSS.posts.map((post) => {
-          if (state.posts.description.includes(post.description)) {
-            return;
-          } else {
-            addPosts(feed.feedId, post, state);
-          }
-        })
-      })
-  })
-};
-
 const app = () => {
   const elements = {
     form: document.querySelector('.rss-form'),
@@ -66,6 +48,7 @@ const app = () => {
     posts: document.querySelector('.posts'),
     feeds: document.querySelector('.feeds'),
     feedback: document.querySelector('.feedback'),
+    modal: document.querySelector('.modal'),
   };
 
   const state = {
@@ -77,7 +60,9 @@ const app = () => {
     },
     feeds: [],
     posts: [],
-    loadedLinks: [],
+    loadedRSS: [],
+    visitedLinks: [],
+    modalId: '',
   };
   
   const defaultLang = 'ru';
@@ -107,7 +92,7 @@ const app = () => {
     const data = formData.get('url');
     watchedState.rssForm.inputUrl = data;
 
-    validateURL(watchedState.rssForm.inputUrl, watchedState.loadedLinks)
+    validateURL(watchedState.rssForm.inputUrl, watchedState.loadedRSS)
       .then((validUrl) => {
         watchedState.rssForm.valid = true;
         watchedState.processState = 'request';
@@ -125,7 +110,7 @@ const app = () => {
          addPosts(feedId, parsedRSS.posts, watchedState);
 
          watchedState.processState = 'loaded';
-         watchedState.loadedLinks.push(watchedState.rssForm.inputUrl);
+         watchedState.loadedRSS.push(watchedState.rssForm.inputUrl);
          watchedState.rssForm.inputUrl = '';
        })
       .catch((error) => {
@@ -141,8 +126,43 @@ const app = () => {
       });    
   });
 
+  elements.posts.addEventListener('click', (e) => {
+      const targetPost = e.target;
+      const targetPostId = targetPost.dataset.id;
+      watchedState.modalId = targetPostId;
+    });
+
+  const postClosingBtns = document.querySelectorAll('button[data-bs-dismiss="modal"]');
+  postClosingBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      watchedState.visitedLinks.push(watchedState.modalId);
+    });
+  })
+
+  const getNewPosts = (state) => {
+    state.feeds.forEach((feed) => {
+      const newPosts = getAxiosResponse(feed.link)
+        .then((res) => {
+          return parse(res.data.contents);
+       })
+      .then((parsedRSS) => {
+          parsedRSS.posts.map((post) => {
+            if (state.posts.description.includes(post.description)) {
+              return;
+            } else {
+              addPosts(feed.feedId, post, state);
+            }
+          })
+        })
+        return newPosts;
+    })
+  };
+  
   if (watchedState.feeds.length !== 0) {
-    setTimeout(getNewPosts, 5000);
+    Promise.all(getNewPosts(watchedState))
+      .finally(() => {
+        setTimeout(getNewPosts(watchedState), 5000);
+      })
   };
 };
 
