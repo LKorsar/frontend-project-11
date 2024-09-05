@@ -163,7 +163,7 @@ const app = () => {
       .finally(() => {
         setTimeout(getNewPosts(watchedState), 5000);
       })
-  };
+  }
 };
 
 export default app;

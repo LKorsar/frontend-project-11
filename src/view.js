@@ -1,6 +1,6 @@
 import onChange from 'on-change';
 
-const handleSuccessLoad = (elements, i18n, state) => {
+const handleSuccessLoad = (elements, i18n) => {
   elements.feedback.classList.remove('text-danger');
   elements.feedback.classList.add('text-success');
   elements.input.classList.remove('is-invalid');
@@ -158,8 +158,10 @@ export default (elements, i18n, state) => {
         break;
       case 'modalId':
         renderModal(elements, state);
+        break;
       case 'visitedLinks':
-        renderOpenedPosts(elements, state);    
+        renderOpenedPosts(elements, state);
+        break;    
       default:
         break;      
     }
