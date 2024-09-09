@@ -1,10 +1,10 @@
 const parse = (responseData) => {
   const parser = new DOMParser();
-  const xmlDocument = parser.parseFromString(responseData, "text/xml");
+  const xmlDocument = parser.parseFromString(responseData, 'text/xml');
 
   if (xmlDocument.querySelector('parsererror')) {
     const err = new Error();
-    err.name = 'parsingError'
+    err.name = 'parsingError';
     throw err;
   } else {
     const channel = xmlDocument.querySelector('channel');

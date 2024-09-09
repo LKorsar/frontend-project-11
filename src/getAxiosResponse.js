@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 const getAxiosResponse = (link) => {
   const allOrigins = 'https://allorigins.hexlet.app/get';
