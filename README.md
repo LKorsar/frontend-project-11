@@ -5,14 +5,14 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/3b8e4be3a71a937c4883/maintainability)](https://codeclimate.com/github/LKorsar/frontend-project-11/maintainability)
 
-#RSS-agregator
+# RSS-agregator
 
-##Description
+## Description
 
 RSS-agregator - is an app, collecting and displaying messages from sourses, exporting RSS-format, such as news-titles, blogs, podcasts or videohostings.  
 Subscribing to RSS-feeds by adding there adresses to agregator, allows a user to keep track of many different websites in a single app, which constantly monitor sites for new content, removing the need for the user to manually check them.
 
 
-##System-requirements
+## System-requirements
 
-##Setup
+## Setup
