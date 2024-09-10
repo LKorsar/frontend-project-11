@@ -41,15 +41,15 @@ const addPosts = (feedId, posts, state) => {
   });
 };
 
-const getNewPosts = (someState) => {
-  const promises = someState.feeds.forEach((feed) => getAxiosResponse(feed.link))
-    .then((res) => parse(res.data.contents))
-    .then((parsedRSS) => {
-      const { posts, feeds } = parsedRSS;
+const getNewPosts = (state) => {
+  const promises = state.loadedRSS.map((link) => getAxiosResponse(link)
+    .then((res) => {
+      const { posts } = parse(res.data.contents);
       posts.forEach((post) => {
-        if (!someState.posts.some((loadedPost) => loadedPost.title === post.title)) {
-          someState.posts.push({
-            idOfFeed: feeds.feed.feedId,
+        const isDuplicate = state.posts
+          .some((loadedPost) => loadedPost.title === post.title);
+        if (!isDuplicate) {
+          state.posts.unshift({
             id: createId(),
             title: post.title,
             description: post.description,
@@ -60,10 +60,10 @@ const getNewPosts = (someState) => {
     })
     .catch((error) => {
       throw error;
-    });
+    }));
   Promise.all(promises)
     .finally(() => {
-      setTimeout(getNewPosts(someState), 5000);
+      setTimeout(getNewPosts(state), 5000);
     });
 };
 
@@ -160,16 +160,14 @@ const app = () => {
     watchedState.modalId = targetPostId;
   });
 
+  getNewPosts(watchedState);
+
   const postClosingBtns = document.querySelectorAll('button[data-bs-dismiss="modal"]');
   postClosingBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       watchedState.visitedLinks.push(watchedState.modalId);
     });
   });
-
-  if (watchedState.feeds.length !== 0) {
-    getNewPosts(watchedState);
-  }
 };
 
 export default app;
