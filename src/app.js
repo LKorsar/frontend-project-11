@@ -37,7 +37,7 @@ const addPosts = (feedId, posts, state) => {
       description: post.description,
       link: post.link,
     };
-    state.posts.unshift(newPost);
+    state.posts.push(newPost);
   });
 };
 
