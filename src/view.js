@@ -100,7 +100,11 @@ const buildContainer = (title, elements, i18n, state) => {
 
       const aEl = document.createElement('a');
       aEl.setAttribute('href', post.link);
-      aEl.classList.add('fw-bold');
+      if (!state.visitedLinks.includes(post.id)) {
+        aEl.classList.add('fw-bold');
+      } else {
+        aEl.classList.add('fw-mormal', 'link-secondary');
+      }
       aEl.setAttribute('data-id', post.id);
       aEl.setAttribute('target', '_blank');
       aEl.setAttribute('rel', 'noopener noreferrer');
@@ -124,31 +128,25 @@ const buildContainer = (title, elements, i18n, state) => {
 
 const renderModal = (elements, state) => {
   const { modal } = elements;
-  modal.classList.add('show');
-  modal.setAttribute('aria-modal', 'true');
-  modal.removeAttribute('aria-hidden');
-  modal.style.display = 'block';
+  if (state.modalId !== '') {
+    modal.classList.add('show');
+    modal.setAttribute('aria-modal', 'true');
+    modal.removeAttribute('aria-hidden');
+    modal.style.display = 'block';
 
-  const loadedPost = state.posts.find((post) => post.id === state.modalId);
-  const modalTitle = document.querySelector('.modal-title');
-  modalTitle.textContent = loadedPost.title;
-  const modalBody = document.querySelector('.modal-body');
-  modalBody.textContent = loadedPost.description;
-  const modalLink = document.querySelector('.full-article');
-  modalLink.href = loadedPost.link;
-};
-
-const renderOpenedPosts = (elements, state) => {
-  const { modal } = elements;
-  modal.classList.remove('show');
-  modal.removeAttribute('aria-modal');
-  modal.style.display = 'none';
-  modal.setAttribute('aria-hidden', 'true');
-
-  const openedPost = document.querySelector(`a[data-id="${state.modalId}"]`);
-  openedPost.classList.remove('fw-bold');
-  openedPost.classList.add('fw-normal');
-  openedPost.classList.add('link-secondary');
+    const loadedPost = state.posts.find((post) => post.id === state.modalId);
+    const modalTitle = document.querySelector('.modal-title');
+    modalTitle.textContent = loadedPost.title;
+    const modalBody = document.querySelector('.modal-body');
+    modalBody.textContent = loadedPost.description;
+    const modalLink = document.querySelector('.full-article');
+    modalLink.href = loadedPost.link;
+  } else {
+    modal.classList.remove('show');
+    modal.removeAttribute('aria-modal');
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+  }
 };
 
 export default (elements, i18n, state) => {
@@ -170,7 +168,7 @@ export default (elements, i18n, state) => {
         renderModal(elements, state);
         break;
       case 'visitedLinks':
-        renderOpenedPosts(elements, state);
+        buildContainer('posts', elements, i18n, state);
         break;
       default:
         break;

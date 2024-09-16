@@ -157,7 +157,10 @@ const app = () => {
   elements.posts.addEventListener('click', (e) => {
     const targetPost = e.target;
     const targetPostId = targetPost.dataset.id;
-    watchedState.modalId = targetPostId;
+    watchedState.visitedLinks.push(targetPostId);
+    if (targetPost.tagName === 'BUTTON') {
+      watchedState.modalId = targetPostId;
+    }
   });
 
   getNewPosts(watchedState);
@@ -165,7 +168,7 @@ const app = () => {
   const postClosingBtns = document.querySelectorAll('button[data-bs-dismiss="modal"]');
   postClosingBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      watchedState.visitedLinks.push(watchedState.modalId);
+      watchedState.modalId = '';
     });
   });
 };
