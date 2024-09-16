@@ -42,7 +42,6 @@ const addPosts = (feedId, posts, state) => {
 };
 
 const getNewPosts = (state) => {
-  console.log('here');
   const promises = state.feeds.map((feed) => getAxiosResponse(feed.link)
     .then((res) => {
       const { posts } = parse(res.data.contents);
@@ -56,7 +55,6 @@ const getNewPosts = (state) => {
             description: post.description,
             link: post.link,
           });
-          console.log('new post added');
         }
       });
     })
@@ -65,7 +63,7 @@ const getNewPosts = (state) => {
     }));
   Promise.all(promises)
     .finally(() => {
-      setTimeout(getNewPosts, 5000);
+      setTimeout(getNewPosts, 5000, state);
     });
 };
 
@@ -142,7 +140,6 @@ const app = () => {
         watchedState.processState = 'loaded';
         watchedState.loadedRSS.push(watchedState.rssForm.inputUrl);
         watchedState.rssForm.inputUrl = '';
-        console.log(watchedState.feeds);
       })
       .catch((error) => {
         watchedState.processState = 'error';
@@ -163,10 +160,7 @@ const app = () => {
     watchedState.modalId = targetPostId;
   });
 
-  if (watchedState.rssForm.valid === true) {
-    console.log('starting');
-    getNewPosts(watchedState);
-  }
+  getNewPosts(watchedState);
 
   const postClosingBtns = document.querySelectorAll('button[data-bs-dismiss="modal"]');
   postClosingBtns.forEach((btn) => {
