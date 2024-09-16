@@ -12,7 +12,10 @@
 RSS-agregator - is an app, collecting and displaying messages from sourses, exporting RSS-format, such as news-titles, blogs, podcasts or videohostings.  
 Subscribing to RSS-feeds by adding there adresses to agregator, allows a user to keep track of many different websites in a single app, which constantly monitor sites for new content, removing the need for the user to manually check them.
 
-
-## System-requirements
-
 ## Setup
+
+```git clone```
+
+```make install```
+
+```make build```
