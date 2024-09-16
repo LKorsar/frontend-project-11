@@ -13,9 +13,16 @@ RSS-agregator - is an app, collecting and displaying messages from sourses, expo
 Subscribing to RSS-feeds by adding there adresses to agregator, allows a user to keep track of many different websites in a single app, which constantly monitor sites for new content, removing the need for the user to manually check them.
 
 ## Setup
+Cloning project from GitHub
 
-```git clone```
-
-```make install```
-
-```make build```
+```bash
+git clone git@github.com:LKorsar/frontend-project-11.git
+```
+Installing
+```
+make install
+```
+Launching the app
+```
+make build
+```
