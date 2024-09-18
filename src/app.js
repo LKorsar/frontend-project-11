@@ -160,6 +160,7 @@ const app = () => {
     watchedState.visitedLinks.push(targetPostId);
     if (targetPost.tagName === 'BUTTON') {
       watchedState.modalId = targetPostId;
+      console.log(watchedState.modalId);
     }
   });
 
