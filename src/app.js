@@ -1,11 +1,11 @@
 import './styles.scss';
 import 'bootstrap';
 import * as yup from 'yup';
+import axios from 'axios';
 import _ from 'lodash';
 import i18next from 'i18next';
 import resources from './locales/index.js';
 import view from './view.js';
-import getAxiosResponse from './getAxiosResponse.js';
 import parse from './parser.js';
 
 const validateURL = (url, urlList) => {
@@ -15,6 +15,14 @@ const validateURL = (url, urlList) => {
     .url()
     .notOneOf(urlList);
   return schema.validate(url);
+};
+
+const getAxiosResponse = (link) => {
+  const proxyAllOrigins = 'https://allorigins.hexlet.app/get';
+  const myUrl = new URL(proxyAllOrigins);
+  myUrl.searchParams.set('disableCache', 'true');
+  myUrl.searchParams.set('url', link);
+  return axios.get(myUrl);
 };
 
 const createId = () => (_.uniqueId());
@@ -31,7 +39,7 @@ const addFeed = (id, title, description, state) => {
 const addPosts = (feedId, posts, state) => {
   posts.forEach((post) => {
     const newPost = {
-      idOfFeed: feedId,
+      feedID: feedId,
       id: createId(),
       title: post.title,
       description: post.description,
@@ -42,6 +50,7 @@ const addPosts = (feedId, posts, state) => {
 };
 
 const getNewPosts = (state) => {
+  const delay = 5000;
   const promises = state.feeds.map((feed) => getAxiosResponse(feed.link)
     .then((res) => {
       const { posts } = parse(res.data.contents);
@@ -63,7 +72,7 @@ const getNewPosts = (state) => {
     }));
   Promise.all(promises)
     .finally(() => {
-      setTimeout(getNewPosts, 5000, state);
+      setTimeout(getNewPosts, delay, state);
     });
 };
 
@@ -76,20 +85,26 @@ const app = () => {
     feeds: document.querySelector('.feeds'),
     feedback: document.querySelector('.feedback'),
     modal: document.querySelector('.modal'),
+    modalTitle: document.querySelector('.modal-title'),
+    modalBody: document.querySelector('.modal-body'),
+    modalLink: document.querySelector('.full-article'),
   };
 
   const state = {
-    processState: 'filling',
-    processError: null,
+    process: {
+      processState: 'filling',
+      processError: null,
+    },
     rssForm: {
       valid: null,
       inputUrl: '',
     },
     feeds: [],
     posts: [],
-    loadedRSS: [],
-    visitedLinks: [],
-    modalId: '',
+    uiState: {
+      visitedLinks: [],
+      modalId: '',
+    },
   };
 
   const defaultLang = 'ru';
@@ -120,10 +135,12 @@ const app = () => {
     const data = formData.get('url');
     watchedState.rssForm.inputUrl = data;
 
-    validateURL(watchedState.rssForm.inputUrl, watchedState.loadedRSS)
+    const loadedRSS = watchedState.feeds.map((feed) => feed.link);
+
+    validateURL(watchedState.rssForm.inputUrl, loadedRSS)
       .then((validUrl) => {
         watchedState.rssForm.valid = true;
-        watchedState.processState = 'request';
+        watchedState.process.processState = 'request';
         return getAxiosResponse(validUrl);
       })
       .then((response) => {
@@ -137,19 +154,18 @@ const app = () => {
         addFeed(feedId, title, description, watchedState);
         addPosts(feedId, parsedRSS.posts, watchedState);
 
-        watchedState.processState = 'loaded';
-        watchedState.loadedRSS.push(watchedState.rssForm.inputUrl);
+        watchedState.process.processState = 'loaded';
         watchedState.rssForm.inputUrl = '';
       })
       .catch((error) => {
-        watchedState.processState = 'error';
+        watchedState.process.processState = 'error';
         watchedState.rssForm.valid = false;
         if (error.isAxiosError) {
-          watchedState.processError = 'Network Error';
+          watchedState.process.processError = 'Network Error';
         } else if (error.name === 'parsingError') {
-          watchedState.processError = 'noRSS';
+          watchedState.process.processError = 'noRSS';
         } else {
-          watchedState.processError = error.message;
+          watchedState.process.processError = error.message;
         }
       });
   });
@@ -157,10 +173,9 @@ const app = () => {
   elements.posts.addEventListener('click', (e) => {
     const targetPost = e.target;
     const targetPostId = targetPost.dataset.id;
-    watchedState.visitedLinks.push(targetPostId);
+    watchedState.uiState.visitedLinks.push(targetPostId);
     if (targetPost.tagName === 'BUTTON') {
-      watchedState.modalId = targetPostId;
-      console.log(watchedState.modalId);
+      watchedState.uiState.modalId = targetPostId;
     }
   });
 
@@ -169,7 +184,7 @@ const app = () => {
   const postClosingBtns = document.querySelectorAll('button[data-bs-dismiss="modal"]');
   postClosingBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      watchedState.modalId = '';
+      watchedState.uiState.modalId = '';
     });
   });
 };

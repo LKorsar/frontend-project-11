@@ -13,16 +13,16 @@ const handleSuccessLoad = (elements, i18n) => {
 
 const handleProcessError = (elements, i18n, state) => {
   const { input, feedback } = elements;
-  if (state.processError !== null) {
+  if (state.process.processError !== null) {
     feedback.classList.remove('text-success');
     feedback.classList.add('text-danger');
     input.classList.add('is-invalid');
-    if (state.processError === 'Network Error') {
+    if (state.process.processError === 'Network Error') {
       feedback.textContent = i18n.t('errors.network');
-    } else if (state.processError === 'noRSS') {
+    } else if (state.process.processError === 'noRSS') {
       feedback.textContent = i18n.t('feedbacks.feedbackNoRSS');
     } else {
-      const errorToDisplay = state.processError;
+      const errorToDisplay = state.process.processError;
       feedback.textContent = i18n.t(errorToDisplay.key);
     }
   } else {
@@ -100,7 +100,7 @@ const buildContainer = (title, elements, i18n, state) => {
 
       const aEl = document.createElement('a');
       aEl.setAttribute('href', post.link);
-      if (!state.visitedLinks.includes(post.id)) {
+      if (!state.uiState.visitedLinks.includes(post.id)) {
         aEl.classList.add('fw-bold');
       } else {
         aEl.classList.add('fw-mormal', 'link-secondary');
@@ -127,20 +127,22 @@ const buildContainer = (title, elements, i18n, state) => {
 };
 
 const renderModal = (elements, state) => {
-  const { modal } = elements;
-  if (state.modalId !== '') {
+  const {
+    modal,
+    modalTitle,
+    modalBody,
+    modalLink,
+  } = elements;
+  if (state.uiState.modalId !== '') {
     modal.classList.add('show');
     modal.setAttribute('aria-modal', 'true');
     modal.removeAttribute('aria-hidden');
     modal.style.display = 'block';
 
-    const loadedPost = state.posts.find((post) => post.id === state.modalId);
-    const modalTitle = document.querySelector('.modal-title');
+    const loadedPost = state.posts.find((post) => post.id === state.uiState.modalId);
     modalTitle.textContent = loadedPost.title;
-    const modalBody = document.querySelector('.modal-body');
     modalBody.textContent = loadedPost.description;
-    const modalLink = document.querySelector('.full-article');
-    modalLink.href = loadedPost.link;
+    modalLink.setAttribute('href', loadedPost.link);
   } else {
     modal.classList.remove('show');
     modal.removeAttribute('aria-modal');
@@ -152,10 +154,10 @@ const renderModal = (elements, state) => {
 export default (elements, i18n, state) => {
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
-      case 'processState':
+      case 'process.processState':
         handleProcessState(elements, value, i18n, state);
         break;
-      case 'processError':
+      case 'process.processError':
         handleProcessError(elements, i18n, state);
         break;
       case 'feeds':
@@ -164,10 +166,10 @@ export default (elements, i18n, state) => {
       case 'posts':
         buildContainer('posts', elements, i18n, state);
         break;
-      case 'modalId':
+      case 'uiState.modalId':
         renderModal(elements, state);
         break;
-      case 'visitedLinks':
+      case 'uiState.visitedLinks':
         buildContainer('posts', elements, i18n, state);
         break;
       default:
