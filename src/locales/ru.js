@@ -10,7 +10,7 @@ export default {
     posts: 'Посты',
     feeds: 'Фиды',
     buttons: {
-      viewBtn: 'Посмотр',
+      viewBtn: 'Просмотр',
     },
     errors: {
       network: 'Ошибка сети',
