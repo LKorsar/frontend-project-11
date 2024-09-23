@@ -100,7 +100,7 @@ const buildContainer = (title, elements, i18n, state) => {
 
       const aEl = document.createElement('a');
       aEl.setAttribute('href', post.link);
-      if (!state.uiState.visitedLinks.includes(post.id)) {
+      if (!state.uiState.visitedLinks.has(post.id)) {
         aEl.classList.add('fw-bold');
       } else {
         aEl.classList.add('fw-mormal', 'link-secondary');

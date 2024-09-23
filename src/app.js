@@ -102,7 +102,7 @@ const app = () => {
     feeds: [],
     posts: [],
     uiState: {
-      visitedLinks: [],
+      visitedLinks: new Set(),
       modalId: '',
     },
   };
@@ -173,7 +173,7 @@ const app = () => {
   elements.posts.addEventListener('click', (e) => {
     const targetPost = e.target;
     const targetPostId = targetPost.dataset.id;
-    watchedState.uiState.visitedLinks.push(targetPostId);
+    watchedState.uiState.visitedLinks.add(targetPostId);
     if (targetPost.tagName === 'BUTTON') {
       watchedState.uiState.modalId = targetPostId;
     }
