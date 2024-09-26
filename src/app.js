@@ -1,5 +1,5 @@
-import './styles.scss';
 import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
 import axios from 'axios';
 import _ from 'lodash';
@@ -158,6 +158,7 @@ const app = () => {
         watchedState.rssForm.inputUrl = '';
       })
       .catch((error) => {
+        console.log(error);
         watchedState.process.processState = 'error';
         watchedState.rssForm.valid = false;
         if (error.isAxiosError) {
